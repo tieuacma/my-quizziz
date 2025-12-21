@@ -1,0 +1,33 @@
+[
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "question": "Next.js sử dụng bộ biên dịch nào để thay thế Babel?",
+    "options": ["Vite", "SWC", "Esbuild", "Turbo"],
+    "answer": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 2,
+    "type": "multiple_choice",
+    "question": "Tại sao nên dùng TypeScript cho dự án nhanh?",
+    "options": ["Để code dài hơn", "Để bắt lỗi sớm", "Để chạy chậm hơn", "Không có tác dụng gì"],
+    "answer": 2,
+    "timeLimit": 20
+  },
+  {
+    "id": 3,
+    "type": "multiple_choice",
+    "question": "Thư viện CSS nào được tích hợp sẵn khi bạn tạo Next.js?",
+    "options": ["Bootstrap", "Sass", "Tailwind CSS", "Styled Components"],
+    "answer": 3,
+    "timeLimit": 20
+  },
+  {
+    "id": 4,
+    "type": "fill_in_blank",
+    "question": "Ai là người phát minh ra định luật vạn vật hấp dẫn?",
+    "answer": ["Newton", "newton"],
+    "timeLimit": 20
+  }
+]
