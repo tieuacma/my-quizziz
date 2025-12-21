@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FillInBlankQuestion } from "../data/quizdata";
 
 interface FillInBlankProps {
@@ -6,10 +6,15 @@ interface FillInBlankProps {
   handleSubmit: (answer: string) => void;
   showFeedback: boolean;
   selectedAnswer: string | null;
+  questionId: number;
 }
 
-export default function FillInBlank({ question, handleSubmit, showFeedback, selectedAnswer }: FillInBlankProps) {
+export default function FillInBlank({ question, handleSubmit, showFeedback, selectedAnswer, questionId }: FillInBlankProps) {
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    setInputValue("");
+  }, [questionId]);
 
   const handleSubmitClick = () => {
     if (inputValue.trim()) {
@@ -43,7 +48,7 @@ export default function FillInBlank({ question, handleSubmit, showFeedback, sele
         disabled={showFeedback}
         onKeyPress={(e) => e.key === 'Enter' && !showFeedback && handleSubmitClick()}
       />
-      {!showFeedback && (
+      {!(showFeedback) && (
         <button
           onClick={handleSubmitClick}
           className="px-8 py-3 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-colors duration-200 font-semibold text-lg"

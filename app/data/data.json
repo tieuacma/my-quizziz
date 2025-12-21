@@ -2,32 +2,344 @@
   {
     "id": 1,
     "type": "multiple_choice",
-    "question": "Next.js sử dụng bộ biên dịch nào để thay thế Babel?",
-    "options": ["Vite", "SWC", "Esbuild", "Turbo"],
-    "answer": 2,
+    "question": "Xếp theo thứ tự thời gian (từ trước đến sau) các cuộc khởi nghĩa vũ trang của nhân dân ta trong 2 năm 1940-1941:",
+    "options": [
+      "Nam Kỳ - Bắc Sơn – Đô Lương",
+      "Bắc Sơn – Đô Lương – Nam Kỳ",
+      "Bắc Sơn – Nam Kỳ - Đô Lương",
+      "Đô Lương – Bắc Sơn – Nam Kỳ"
+    ],
+    "answer": 3,
     "timeLimit": 20
   },
   {
     "id": 2,
     "type": "multiple_choice",
-    "question": "Tại sao nên dùng TypeScript cho dự án nhanh?",
-    "options": ["Để code dài hơn", "Để bắt lỗi sớm", "Để chạy chậm hơn", "Không có tác dụng gì"],
+    "question": "Hình thức và phương pháp đấu tranh được sử dụng trong cao trào cách mạng 1936 – 1939 là:",
+    "options": [
+      "Tuyệt đối bí mật, bất hợp pháp",
+      "Công khai và nửa công khai là chủ yếu",
+      "Bí mật là chủ yếu, công khai là thứ yếu",
+      "Đưa lực lượng ra công khai hoàn toàn"
+    ],
     "answer": 2,
     "timeLimit": 20
   },
   {
     "id": 3,
     "type": "multiple_choice",
-    "question": "Thư viện CSS nào được tích hợp sẵn khi bạn tạo Next.js?",
-    "options": ["Bootstrap", "Sass", "Tailwind CSS", "Styled Components"],
-    "answer": 3,
+    "question": "Ngày 22/12 được chọn là ngày Quốc phòng toàn dân từ năm nào?",
+    "options": ["1989", "1990", "1991", "1992"],
+    "answer": 1,
     "timeLimit": 20
   },
   {
     "id": 4,
+    "type": "multiple_choice",
+    "question": "Lúc mới thành lập, Quân đội nhân dân Việt Nam có bao nhiêu chiến sĩ?",
+    "options": ["32", "33", "34", "35"],
+    "answer": 3,
+    "timeLimit": 20
+  },
+  {
+    "id": 5,
+    "type": "multiple_choice",
+    "question": "Ngay sau khi thành lập, trong tháng 12 năm 1944, Đội Việt Nam Tuyên truyền Giải phóng quân đã có hai chiến thắng vang dội nào?",
+    "options": [
+      "Biên giới và Việt Bắc",
+      "Biên giới và Phai Khắt",
+      "Phai Khắt và Nà Ngần",
+      "Nà Ngần và Việt Bắc"
+    ],
+    "answer": 3,
+    "timeLimit": 20
+  },
+  {
+    "id": 6,
+    "type": "multiple_choice",
+    "question": "Tại khu rừng này đã diễn ra lễ tuyên thệ thành lập Đội Việt Nam tuyên truyền Giải phóng quân? ",
+    "options": [
+      "Khu rừng Việt Bắc",
+      "Khu rừng Cúc Phương",
+      "Khu rừng Trần Hưng Đạo",
+      "Khu rừng Pắc Pó"
+    ],
+    "answer": 3,
+    "timeLimit": 20
+  },
+  {
+    "id": 7,
+    "type": "multiple_choice",
+    "question": "Ai là người được nhắc đến trong câu nói của Chủ tịch Hồ Chí Minh nói: “Phó Tổng tư lệnh quân giải phóng là cô …. Cả thế giới chỉ nước ta có vị tướng quân gái như vậy. Thật là vẻ vang cho miền Nam, cho cả dân tộc ta",
+    "options": [
+      "Nguyễn Thị Bình",
+      "Trần Thị Lý",
+      "Phan Thị Ràng (Chị Sứ)",
+      "Nguyễn Thị Định"
+    ],
+    "answer": 4,
+    "timeLimit": 20
+  },
+  {
+    "id": 8,
+    "type": "multiple_choice",
+    "question": "Ông là người được giao nhiệm vụ là Tổng Tư lệnh Chiến dịch giải phóng Sài Gòn – Gia Định. Ông là ai ?",
+    "options": [
+      "Chu Huy Mân",
+      "Hoàng Văn Thái",
+      "Văn Tiến Dũng",
+      "Võ Nguyên Giáp"
+    ],
+    "answer": 3,
+    "timeLimit": 20
+  },
+  {
+    "id": 9,
+    "type": "multiple_choice",
+    "question": "Quân kỳ của Quân đội Nhân dân Việt Nam khác quốc kỳ Việt Nam ở điểm nào?",
+    "options": [
+      "Có dòng chữ \"Quyết thắng\" màu vàng",
+      "Có dòng chữ \"Quyết chiến quyết thắng\"",
+      "Có dòng chữ \"Trung với nước\"",
+      "Có dòng chữ \"Trung với nước hiếu với dân\""
+    ],
+    "answer": 1,
+    "timeLimit": 20
+  },
+
+  {
+    "id": 10,
     "type": "fill_in_blank",
-    "question": "Ai là người phát minh ra định luật vạn vật hấp dẫn?",
-    "answer": ["Newton", "newton"],
+    "question": "Đội Việt Nam Tuyên truyền Giải phóng quân ra đời vào ngày tháng năm nào?",
+    "answer": ["22/12/1944", "22-12-1944", "22 tháng 12 năm 1944"],
+    "timeLimit": 20
+  },
+  {
+    "id": 11,
+    "type": "fill_in_blank",
+    "question": "Đội Việt Nam Tuyên truyền Giải phóng quân khi thành lập gồm bao nhiêu chiến sĩ và do ai chỉ huy?",
+    "answer": [
+      "34 chiến sĩ do Võ Nguyên Giáp chỉ huy",
+      "34 chiến sĩ, Võ Nguyên Giáp",
+      "34, Võ Nguyên Giáp",
+      "34 Võ Nguyên Giáp",
+      "34 chiến sĩ Võ Nguyên Giáp"
+    ],
+    "timeLimit": 20
+  },
+  {
+    "id": 12,
+    "type": "fill_in_blank",
+    "question": "Vị Tổng tư lệnh trực tiếp chỉ huy chiến dịch Điện Biên Phủ là ai?",
+    "answer": ["Võ Nguyên Giáp", "Đại tướng Võ Nguyên Giáp"],
+    "timeLimit": 20
+  },
+  {
+    "id": 13,
+    "type": "fill_in_blank",
+    "question": "Nhà thơ Tố Hữu từng viết:\n\"Chín năm làm một Điện Biên\nNên vành hoa đỏ, nên thiên sử vàng\"\nKhoảng thời gian \"chín năm\" trong hai câu thơ trên là khoảng thời gian nào?",
+    "answer": ["1945-1954", "từ năm 1945 đến năm 1954"],
+    "timeLimit": 20
+  },
+  {
+    "id": 14,
+    "type": "fill_in_blank",
+    "question": "Ngày giải phóng miền Nam, thống nhất đất nước là ngày tháng năm nào?",
+    "answer": ["30/4/1975", "30-4-1975", "30 tháng 4 năm 1975"],
+    "timeLimit": 20
+  },
+  {
+    "id": 15,
+    "type": "fill_in_blank",
+    "question": "Anh hùng lực lượng vũ trang nhân dân đã lấy thân mình lấp lỗ châu mai trong kháng chiến chống Pháp là ai?",
+    "answer": ["Phan Đình Giót"],
+    "timeLimit": 20
+  },
+  {
+    "id": 16,
+    "type": "fill_in_blank",
+    "question": "Chiến dịch Điện Biên Phủ kết thúc vào ngày tháng năm nào?",
+    "answer": ["7/5/1954", "7 tháng 5 năm 1954"],
+    "timeLimit": 20
+  },
+  {
+    "id": 17,
+    "type": "fill_in_blank",
+    "question": "Ngày 22/12 được chọn là ngày Quốc phòng toàn dân từ năm nào?",
+    "answer": ["1989"],
+    "timeLimit": 20
+  },
+  {
+    "id": 18,
+    "type": "fill_in_blank",
+    "question": "Ngay sau khi thành lập, Đội Việt Nam Tuyên truyền Giải phóng quân đã giành hai chiến thắng vang dội nào?",
+    "answer": ["Phai Khắt và Nà Ngần"],
+    "timeLimit": 20
+  },
+  {
+    "id": 19,
+    "type": "fill_in_blank",
+    "question": "Khu rừng nào là nơi diễn ra lễ tuyên thệ thành lập Đội Việt Nam Tuyên truyền Giải phóng quân?",
+    "answer": ["Khu rừng Trần Hưng Đạo"],
+    "timeLimit": 20
+  },
+  {
+    "id": 20,
+    "type": "fill_in_blank",
+    "question": "Ai là người được nhắc đến trong câu nói của Chủ tịch Hồ Chí Minh nói: “Phó Tổng tư lệnh quân giải phóng là cô …. Cả thế giới chỉ nước ta có vị tướng quân gái như vậy. Thật là vẻ vang cho miền Nam, cho cả dân tộc ta”?",
+    "answer": ["Nguyễn Thị Định"],
+    "timeLimit": 20
+  },
+  {
+    "id": 21,
+    "type": "fill_in_blank",
+    "question": "Chiến dịch thành cổ Quảng Trị diễn ra bao nhiêu ngày đêm?",
+    "answer": ["81 ngày đêm", "81"],
+    "timeLimit": 20
+  },
+  {
+    "id": 22,
+    "type": "fill_in_blank",
+    "question": "Bộ trưởng Bộ Quốc phòng của Quân đội nhân dân Việt Nam hiện nay là ai?",
+    "answer": ["Phan Văn Giang", "Đại tướng Phan Văn Giang"],
+    "timeLimit": 20
+  },
+  {
+    "id": 23,
+    "type": "fill_in_blank",
+    "question": "Tên gọi khác của ngày thành lập Quân đội nhân dân Việt Nam là gì?",
+    "answer": ["Ngày hội Quốc phòng toàn dân"],
+    "timeLimit": 20
+  },
+  {
+    "id": 24,
+    "type": "fill_in_blank",
+    "question": "Người được mệnh danh là cha đẻ của ngành quân giới Việt Nam là ai?",
+    "answer": ["Trần Đại Nghĩa", "Đại tướng Trần Đại Nghĩa"],
+    "timeLimit": 20
+  },
+  {
+    "id": 25,
+    "type": "fill_in_blank",
+    "question": "Ai là vị Đại tướng từng giữ chức Chủ tịch nước?",
+    "answer": ["Lê Đức Anh", "Đại tướng Lê Đức Anh"],
+    "timeLimit": 20
+  },
+  {
+    "id": 26,
+    "type": "fill_in_blank",
+    "question": "Cơ quan ngôn luận chính thức của Quân đội nhân dân Việt Nam là gì?",
+    "answer": ["Báo Quân đội nhân dân"],
+    "timeLimit": 20
+  },
+  {
+    "id": 27,
+    "type": "fill_in_blank",
+    "question": "Tên gọi \"Quân đội nhân dân Việt Nam\" là do ai đặt?",
+    "answer": ["Hồ Chí Minh", "Chủ tịch Hồ Chí Minh", "Bác Hồ"],
+    "timeLimit": 20
+  },
+  {
+    "id": 28,
+    "type": "fill_in_blank",
+    "question": "Những vị tướng nào của Việt Nam được vinh danh là Danh tướng Thế giới?",
+    "answer": ["Trần Hưng Đạo, Nguyễn Huệ, Võ Nguyên Giáp", "Trần Hưng Đạo, Nguyễn Huệ và Võ Nguyên Giáp",
+                "Nguyễn Huệ, Trần Hưng Đạo, Võ Nguyên Giáp", "Nguyễn Huệ, Võ Nguyên Giáp và Trần Hưng Đạo",
+                "Võ Nguyên Giáp, Trần Hưng Đạo và Nguyễn Huệ", "Võ Nguyên Giáp, Nguyễn Huệ và Trần Hưng Đạo",
+               "Trần Hưng Đạo Nguyễn Huệ Võ Nguyên Giáp", "Nguyễn Huệ Trần Hưng Đạo Võ Nguyên Giáp",
+               "Võ Nguyên Giáp Trần Hưng Đạo Nguyễn Huệ", "Nguyễn Huệ Võ Nguyên Giáp Trần Hưng Đạo",
+               "Trần Hưng Đạo Võ Nguyên Giáp Nguyễn Huệ", "Võ Nguyên Giáp Nguyễn Huệ Trần Hưng Đạo"],
+    "timeLimit": 20
+  },
+  {
+    "id": 29,
+    "type": "fill_in_blank",
+    "question": "Chiến dịch nào mở đầu cuộc Tổng tiến công và nổi dậy mùa Xuân năm 1975?",
+    "answer": ["Chiến dịch Tây Nguyên", "Tây Nguyên"],
+    "timeLimit": 20
+  },
+  {
+    "id": 30,
+    "type": "fill_in_blank",
+    "question": "Đội Việt Nam Tuyên truyền Giải phóng quân được thành lập ở đâu?",
+    "answer": ["Huyện Nguyên Bình, tỉnh Cao Bằng", "Nguyên Bình, Cao Bằng"],
+    "timeLimit": 20
+  },
+  {
+    "id": 31,
+    "type": "fill_in_blank",
+    "question": "Ông là người được giao nhiệm vụ là Tổng Tư lệnh Chiến dịch giải phóng Sài Gòn - Gia Định. Ông là ai?",
+    "answer": ["Văn Tiến Dũng", "Đại tướng Văn Tiến Dũng"],
+    "timeLimit": 20
+  },
+  {
+    "id": 32,
+    "type": "fill_in_blank",
+    "question": "Chiến thắng được ví như Bạch Đằng, Chi Lăng, Đống Đa của thế kỷ XX là chiến thắng nào?",
+    "answer": ["Chiến thắng Điện Biên Phủ", "Điện Biên Phủ 1954", "Điện Biên Phủ", "Chiến dịch Điện Biên Phủ", "Chiến dịch Điện Biên Phủ năm 1954", "Chiến thắng Điện Biên Phủ năm 1954", "Điện Biên Phủ năm 1954", "Chiến dịch Điện Biên Phủ 1954", "Chiến thắng Điện Biên Phủ 1954", "Điện Biên Phủ 1954"],
+    "timeLimit": 20
+  },
+  {
+    "id": 33,
+    "type": "fill_in_blank",
+    "question": "Chiến dịch Điện Biên Phủ trên không diễn ra trong bao lâu?",
+    "answer": ["12 ngày đêm", "12"],
+    "timeLimit": 20
+  },
+  {
+    "id": 34,
+    "type": "fill_in_blank",
+    "question": "Người duy nhất giữ chức Tổng tư lệnh các lực lượng vũ trang là ai?",
+    "answer": ["Võ Nguyên Giáp", "Đại tướng Võ Nguyên Giáp"],
+    "timeLimit": 20
+  },
+  {
+    "id": 35,
+    "type": "fill_in_blank",
+    "question": "Lực lượng vũ trang Quân đội nhân dân Việt Nam bao gồm những lực lượng nào?",
+    "answer": ["Lục quân, Hải quân, Phòng không", "Lục quân, Hải quân và Phòng không", 
+               "Lục quân Hải quân Phòng không", "Lục quân và Hải quân Phòng không",
+               "Lục quân Hải quân và Phòng không", "Lục quân và Hải quân và Phòng không",
+                "Lục quân, Phòng không, Hải quân", "Lục quân Phòng không Hải quân",
+                "Lục quân và Phòng không và Hải quân", "Lục quân và Phòng không Hải quân",
+               "Hải quân, Lục quân, Phòng không", "Hải quân Lục quân Phòng không",
+               "Hải quân và Lục quân Phòng không", "Hải quân Lục quân và Phòng không",
+               "Hải quân và Lục quân và Phòng không", "Hải quân, Phòng không, Lục quân",
+               "Hải quân Phòng không Lục quân", "Hải quân và Phòng không Lục quân",
+               "Hải quân Phòng không và Lục quân", "Hải quân và Phòng không và Lục quân",
+               "Phòng không, Lục quân, Hải quân", "Phòng không Lục quân Hải quân",
+               "Phòng không và Lục quân Hải quân", "Phòng không Lục quân và Hải quân",
+               "Phòng không và Lục quân và Hải quân", "Phòng không, Hải quân, Lục quân",
+               "Phòng không Hải quân Lục quân", "Phòng không và Hải quân Lục quân",
+               "Phòng không Hải quân và Lục quân", "Phòng không và Hải quân và Lục quân"],
+    "timeLimit": 20
+  },
+  {
+    "id": 36,
+    "type": "fill_in_blank",
+    "question": "Dòng chữ in trên cờ của Quân đội nhân dân Việt Nam là gì?",
+    "answer": ["Quyết thắng", "dòng chữ Quyết thắng", "Chữ Quyết thắng", "Quyết chiến quyết thắng", "dòng chữ Quyết chiến quyết thắng", "Chữ Quyết chiến quyết thắng"],
+    "timeLimit": 20
+  },
+  {
+    "id": 37,
+    "type": "fill_in_blank",
+    "question": "Ngôi trường được thành lập theo sắc dụ của vua Thành Thái ngày 23/10/1896 là trường nào?",
+    "answer": ["Trường Quốc học Huế", "Quốc học Huế", "Trường Quốc học tỉnh Thừa Thiên", "Quốc học tỉnh Thừa Thiên"],
+    "timeLimit": 20
+  },
+  {
+    "id": 38,
+    "type": "fill_in_blank",
+    "question": "Sắc lệnh phong tướng cho 11 cá nhân ký ngày 20/1/1948 có tên là gì?",
+    "answer": ["Sắc lệnh 110/SL", "Sắc lệnh 110", "Sắc lệnh số 110/SL", "Sắc lệnh số 110", "Sắc lệnh số 110", "Sắc lệnh số 110 SL", "Sắc lệnh 110 SL"],
+    "timeLimit": 20
+  },
+  {
+    "id": 39,
+    "type": "fill_in_blank",
+    "question": "Hội nghị Ban Thường vụ Trung ương Đảng tháng 2 năm 1943 chủ trương thành lập mặt trận nào?",
+    "answer": ["Mặt trận dân chủ chống Nhật"],
     "timeLimit": 20
   }
 ]

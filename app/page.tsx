@@ -67,6 +67,7 @@ export default function QuizPage() {
                 handleSubmit={handleAnswerClick}
                 showFeedback={showFeedback}
                 selectedAnswer={selectedAnswer}
+                questionId={questions[currentQuestion].id}
               />
             )}
           </div>

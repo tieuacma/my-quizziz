@@ -51,8 +51,6 @@ export const useQuiz = () => {
     if (timeLeft > 0 && !showScore && !showFeedback) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && !showScore && !showFeedback) {
-      handleNextQuestion();
     }
   }, [timeLeft, showScore, showFeedback]);
 
@@ -71,28 +69,46 @@ export const useQuiz = () => {
     const timeSpent = question.timeLimit - timeLeft;
     setTotalTimeSpent(prev => prev + timeSpent);
 
-    if (checkAnswer(question, userAnswer)) {
-      setCorrectAnswers(prev => prev + 1);
-      setCurrentStreak(prev => {
-        const newStreak = prev + 1;
-        setMaxStreak(currentMax => Math.max(currentMax, newStreak));
-        return newStreak;
-      });
-      const timeLimit = question.timeLimit;
-      const points = Math.round((1000 + (timeLeft / timeLimit) * 500) / 10) * 10;
-      setPointsEarned(points);
-      setTimeout(() => {
-        setScore(prevScore => prevScore + points);
+    if (timeLeft <= 0) {
+      // Time out case
+      if (checkAnswer(question, userAnswer)) {
+        const scoreMin = Math.min(1000, 200 + Math.floor(100 * currentStreak / 3));
+        setScore(prevScore => prevScore + scoreMin);
         setScoreUpdateAnimation(true);
-        setTimeout(() => setScoreUpdateAnimation(false), 100);
+        setTimeout(() => setScoreUpdateAnimation(false), 500);
+        setCurrentStreak(0); // Reset streak
+      } else {
+        setCurrentStreak(0);
+      }
+      setTimeout(() => {
         handleNextQuestion();
       }, 1000);
     } else {
-      setCurrentStreak(0);
-      setPointsEarned(0);
-      setTimeout(() => {
-        handleNextQuestion();
-      }, 1000);
+      // Normal case
+      if (checkAnswer(question, userAnswer)) {
+        setCorrectAnswers(prev => prev + 1);
+        const timeLimit = question.timeLimit;
+        const base = Math.round((1000 + (timeLeft / timeLimit) * 500) / 10) * 10;
+        const points = base + Math.floor(100 * currentStreak / 3);
+        setPointsEarned(points);
+        setCurrentStreak(prev => {
+          const newStreak = prev + 1;
+          setMaxStreak(currentMax => Math.max(currentMax, newStreak));
+          return newStreak;
+        });
+        setTimeout(() => {
+          setScore(prevScore => prevScore + points);
+          setScoreUpdateAnimation(true);
+          setTimeout(() => setScoreUpdateAnimation(false), 500);
+          handleNextQuestion();
+        }, 1000);
+      } else {
+        setCurrentStreak(0);
+        setPointsEarned(0);
+        setTimeout(() => {
+          handleNextQuestion();
+        }, 1000);
+      }
     }
   };
 
