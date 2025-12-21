@@ -25,13 +25,12 @@ jobs:
         run: npm install
 
       - name: Build
-        run: |
-          npm run build
-          npm run export   # xuất ra static site trong thư mục out/
+        run: npm run build
+        # Với Next.js 16 + output: 'export', build sẽ tự tạo thư mục ./out
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
-          force_orphan: true   # fix lỗi push, tạo branch gh-pages mới mỗi lần
+          force_orphan: true

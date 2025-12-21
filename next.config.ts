@@ -1,6 +1,7 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-}
-
-export default nextConfig;
+  images: { unoptimized: true },
+  basePath: '/my-quizziz',   // thay bằng tên repo của bạn
+  assetPrefix: '/my-quizziz/',
+};
+module.exports = nextConfig;
