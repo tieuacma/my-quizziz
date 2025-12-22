@@ -1,7 +1,17 @@
+const isVercel = process.env.VERCEL === '1';
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  images: { unoptimized: true },
-  basePath: '/my-quizziz',   // thay bằng tên repo của bạn
-  assetPrefix: '/my-quizziz/',
+  // Nếu chạy trên Vercel, không dùng 'export'. Nếu GitHub Pages thì giữ 'export'
+  output: isVercel ? undefined : 'export',
+  
+  images: { 
+    unoptimized: true 
+  },
+  
+  // Chỉ áp dụng basePath và assetPrefix khi KHÔNG phải là Vercel
+  basePath: isVercel ? '' : '/my-quizziz',
+  assetPrefix: isVercel ? '' : '/my-quizziz/',
 };
-module.exports = nextConfig;
+
+export default nextConfig;
