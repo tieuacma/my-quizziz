@@ -7,20 +7,24 @@ interface OptionsProps {
 
 export default function Options({ options, getOptionClass, handleAnswerClick, showFeedback }: OptionsProps) {
   return (
-    <div className="grid grid-cols-1 gap-6">
+    /* Giữ nguyên grid 2 cột để ô đáp án to và thoáng */
+    <div className="grid grid-cols-2 gap-8 mt-10">
       {options.map((option, index) => (
         <button
           key={index}
           onClick={() => !showFeedback && handleAnswerClick(option)}
-          className={getOptionClass(option)}
           disabled={showFeedback}
+          /* justify-center và items-center để nội dung luôn nằm giữa ô */
+          className={`${getOptionClass(option)} 
+            flex items-center justify-center 
+            p-8 rounded-[2rem] border-2 
+            transition-all min-h-[110px] group shadow-sm 
+            hover:shadow-xl active:scale-95`}
         >
-          <div className="flex items-center">
-            <span className="inline-block w-12 h-12 bg-gradient-to-r from-gray-100 to-gray-200 group-hover:from-purple-200 group-hover:to-pink-200 text-center leading-12 rounded-2xl mr-6 font-bold text-gray-600 group-hover:text-purple-700 transition-all text-xl">
-              {String.fromCharCode(65 + index)}
-            </span>
-            <span className="text-gray-700 group-hover:text-gray-900 font-medium text-xl">{option}</span>
-          </div>
+          {/* Chỉ giữ lại thẻ span chứa nội dung câu trả lời */}
+          <span className="text-gray-700 font-semibold text-2xl text-center leading-tight">
+            {option}
+          </span>
         </button>
       ))}
     </div>

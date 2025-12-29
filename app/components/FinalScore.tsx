@@ -4,14 +4,16 @@ interface FinalScoreProps {
   correctAnswers: number;
   totalTimeSpent: number;
   maxStreak: number;
+  onPlayAgain?: () => void;
 }
 
-export default function FinalScore({ 
-  score, 
-  totalQuestions, 
-  correctAnswers, 
-  totalTimeSpent, 
-  maxStreak 
+export default function FinalScore({
+  score,
+  totalQuestions,
+  correctAnswers,
+  totalTimeSpent,
+  maxStreak,
+  onPlayAgain
 }: FinalScoreProps) {
   const averageTime = totalQuestions > 0 ? Math.round(totalTimeSpent / totalQuestions) : 0;
 
@@ -70,7 +72,7 @@ export default function FinalScore({
       </div>
 
       <button
-        onClick={() => window.location.reload()}
+        onClick={onPlayAgain || (() => window.location.reload())}
         className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-5 px-12 rounded-3xl transition-all transform hover:scale-105 shadow-lg text-xl"
       >
         Chơi lại

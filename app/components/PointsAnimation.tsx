@@ -34,12 +34,4 @@ export default function PointsAnimation({ showPointsAnimation, pointsEarned }: P
         return 'opacity-0';
     }
   };
-
-  return (
-    <div className="absolute top-20 right-6 z-10 transition-all duration-300 ease-linear">
-      <div className={`text-green-500 font-bold text-2xl transform ${getClass()} animate-pulse filter drop-shadow-lg`}>
-        +{pointsEarned} điểm
-      </div>
-    </div>
-  );
 }

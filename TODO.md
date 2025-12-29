@@ -1,9 +1,8 @@
-- [x] Create app/auth folder
-- [x] Move and update login page to app/auth/login/page.tsx
-- [x] Create sign-up page at app/auth/signup/page.tsx
-- [x] Create app/auth/actions.ts with updated signIn and signUp functions
-- [x] Implement password validation function
-- [x] Update signUp to check for existing email and username, validate password
-- [x] Update signIn to allow username or email
-- [x] Update any references to old login path
-- [x] Remove old login folder
+# TODO: Split useQuiz.ts into multiple files
+
+- [ ] Create quizInitialState.ts for initial state logic
+- [ ] Create quizEffects.ts for effects (loading, timer, saving)
+- [ ] Create quizHandlers.ts for handlers (handleAnswerClick, handleNextQuestion, getOptionClass, resetQuiz)
+- [ ] Update useQuiz.ts to use the new files
+- [ ] Update useQuizLogic.ts if needed (possibly remove or integrate)
+- [ ] Test the changes

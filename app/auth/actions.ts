@@ -4,6 +4,11 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+type ActionState = {
+  error?: string
+  field?: string
+} | null
+
 function validatePassword(password: string): string | null {
   if (password.length < 6) {
     return 'Mật khẩu phải có ít nhất 6 ký tự.'
@@ -23,7 +28,7 @@ function validatePassword(password: string): string | null {
   return null
 }
 
-export async function signIn(formData: FormData) {
+export async function signIn(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const supabase = await createClient()
 
   const identifier = formData.get('identifier') as string
@@ -36,8 +41,8 @@ export async function signIn(formData: FormData) {
   if (!isEmail) {
     // To handle username, we need to query the profiles table or user_metadata
     // Assuming a profiles table exists with username and user_id
-    // For now, throw error as table may not exist
-    throw new Error('Đăng nhập bằng username chưa được hỗ trợ. Vui lòng sử dụng email.')
+    // For now, return error as table may not exist
+    return { error: 'Đăng nhập bằng username chưa được hỗ trợ. Vui lòng sử dụng email.', field: 'identifier' }
   }
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -46,14 +51,14 @@ export async function signIn(formData: FormData) {
   })
 
   if (error) {
-    throw new Error(error.message)
+    return { error: error.message, field: 'password' }
   }
 
   revalidatePath('/', 'layout')
   redirect('/')
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const supabase = await createClient()
 
   const username = formData.get('username') as string
@@ -63,7 +68,7 @@ export async function signUp(formData: FormData) {
   // Validate password
   const passwordError = validatePassword(password)
   if (passwordError) {
-    throw new Error(passwordError)
+    return { error: passwordError, field: 'password' }
   }
 
   // Check if username exists (assuming profiles table exists)
@@ -75,7 +80,7 @@ export async function signUp(formData: FormData) {
     .single()
 
   if (existingUser) {
-    throw new Error('Username này đã được sử dụng.')
+    return { error: 'Username này đã được sử dụng.', field: 'username' }
   }
 
   const { error } = await supabase.auth.signUp({
@@ -90,9 +95,9 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     if (error.message.includes('already registered')) {
-      throw new Error('Email này đã có tài khoản.')
+      return { error: 'Email này đã có tài khoản.', field: 'email' }
     }
-    throw new Error(error.message)
+    return { error: error.message, field: 'email' }
   }
 
   revalidatePath('/', 'layout')
