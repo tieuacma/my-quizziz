@@ -36,6 +36,7 @@ export const useQuiz = () => {
     timeLeft,
     currentStreak,
     showFeedback,
+    selectedAnswer,
     setSelectedAnswer,
     setShowFeedback,
     setPointsEarned,
