@@ -1,8 +1,8 @@
 import clientPromise from "@/lib/mongodb/client";
 import { NextResponse } from "next/server";
 
-// Ép Next.js luôn thực hiện fetch mới, không cache kết quả lỗi
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs"; // 🔥 BẮT BUỘC
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
