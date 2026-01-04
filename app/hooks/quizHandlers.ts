@@ -1,14 +1,16 @@
 import { useCallback } from "react";
-import { Question, checkAnswer } from "../data/quizdata";
+import { Question, checkAnswer, ReadingSubQuestion } from "../data/quizdata";
 
 interface QuizHandlersProps {
   questions: Question[];
   currentQuestion: number;
+  subIndex: number;
+  setSubIndex: React.Dispatch<React.SetStateAction<number>>;
   timeLeft: number;
   currentStreak: number;
   showFeedback: boolean;
-  selectedAnswer: string | null;
-  setSelectedAnswer: (answer: string | null) => void;
+  selectedAnswer: string | number | null;
+  setSelectedAnswer: (answer: string | number | null) => void;
   setShowFeedback: (show: boolean) => void;
   setPointsEarned: (points: number) => void;
   setScore: (value: number | ((prev: number) => number)) => void;
@@ -20,38 +22,37 @@ interface QuizHandlersProps {
   setCurrentQuestion: (question: number) => void;
   setTimeLeft: (time: number) => void;
   setShowScore: (show: boolean) => void;
-  setWrongAnswers: (id: number) => void;
+  wrongAnswers: number[];
+  setWrongAnswers: (id: number, isCorrectRevise?: boolean) => void;
+  isReviseMode: boolean;
+  setIsReviseMode: (val: boolean) => void;
+  showReviseSelection: boolean;
+  setShowReviseSelection: (val: boolean) => void;
+  reviseOptions: any[];
+  setReviseOptions: (options: any[]) => void;
+  tempQuestion: any | null;
+  setTempQuestion: (q: any | null) => void;
+  completedSubQuestions: { id: number; correct: boolean }[];
+  setCompletedSubQuestions: React.Dispatch<React.SetStateAction<{ id: number; correct: boolean }[]>>;
 }
 
-export const useQuizHandlers = ({
-  questions,
-  currentQuestion,
-  timeLeft,
-  currentStreak,
-  showFeedback,
-  selectedAnswer,
-  setSelectedAnswer,
-  setShowFeedback,
-  setPointsEarned,
-  setScore,
-  setCorrectAnswers,
-  setCurrentStreak,
-  setMaxStreak,
-  setShowPointsAnimation,
-  setScoreUpdateAnimation,
-  setCurrentQuestion,
-  setTimeLeft,
-  setShowScore,
-  setWrongAnswers,
-}: QuizHandlersProps) => {
+export const useQuizHandlers = (props: QuizHandlersProps) => {
+  const {
+    questions, currentQuestion, subIndex, setSubIndex, timeLeft, currentStreak,
+    showFeedback, selectedAnswer, setSelectedAnswer, setShowFeedback, setPointsEarned,
+    setScore, setCorrectAnswers, setCurrentStreak, setMaxStreak, setShowPointsAnimation,
+    setScoreUpdateAnimation, setCurrentQuestion, setTimeLeft, setShowScore,
+    wrongAnswers, setWrongAnswers, isReviseMode, setIsReviseMode, showReviseSelection,
+    setShowReviseSelection, reviseOptions, setReviseOptions, tempQuestion, setTempQuestion,
+    completedSubQuestions, setCompletedSubQuestions,
+  } = props;
 
-  /**
-   * Chuyển sang câu hỏi tiếp theo hoặc kết thúc quiz
-   */
+  // 1. Logic chuyển câu hỏi tiếp theo
   const handleNextQuestion = useCallback(() => {
     const nextQuestion = currentQuestion + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestion(nextQuestion);
+      setSubIndex(0);
       setTimeLeft(questions[nextQuestion].timeLimit || 20);
       setSelectedAnswer(null);
       setShowFeedback(false);
@@ -59,133 +60,177 @@ export const useQuizHandlers = ({
     } else {
       setShowScore(true);
     }
-  }, [currentQuestion, questions, setCurrentQuestion, setTimeLeft, setSelectedAnswer, setShowFeedback, setPointsEarned, setShowScore]);
+  }, [currentQuestion, questions, setCurrentQuestion, setSubIndex, setTimeLeft, setSelectedAnswer, setShowFeedback, setPointsEarned, setShowScore]);
 
-  /**
-   * Xử lý khi người dùng chọn đáp án
-   * Tích hợp logic Điểm hy vọng (Hope Points)
-   */
-  const handleAnswerClick = useCallback((selectedOption: string) => {
-    if (showFeedback) return; // Ngăn bấm nhiều lần khi đang hiện feedback
+  // 2. Logic chọn câu hỏi phục thù từ danh sách
+  const selectReviseQuestion = useCallback((q: any) => {
+    setTempQuestion(q);
+    setIsReviseMode(true);
+    setShowReviseSelection(false);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setTimeLeft((q as Question).timeLimit || 20);
+  }, [setIsReviseMode, setShowReviseSelection, setSelectedAnswer, setShowFeedback, setTimeLeft, setTempQuestion]);
 
-    const question = questions[currentQuestion];
+  // 3. Logic xử lý khi người dùng chọn đáp án
+  const handleAnswerClick = useCallback((selectedOption: string | number) => {
+    if (showFeedback) return;
+
+    // Ép kiểu về any để linh hoạt truy cập thuộc tính options mà không bị lỗi TS
+    let activeQuestion: any = tempQuestion || questions[currentQuestion];
+    if (activeQuestion.type === "reading" && !isReviseMode) {
+      activeQuestion = activeQuestion.subQuestions[subIndex];
+    }
+
     setSelectedAnswer(selectedOption);
     setShowFeedback(true);
 
-    // Chuyển đổi option text sang định dạng answer (1, 2, 3...) hoặc giữ nguyên nếu là text
-    let userAnswer: string | number;
-    if (question.type === "multiple_choice") {
-      userAnswer = (question.options?.indexOf(selectedOption) ?? -1) + 1;
-    } else {
-      userAnswer = selectedOption;
-    }
-
-    const isCorrect = checkAnswer(question, userAnswer);
-
-    if (isCorrect) {
-      // 1. Tính toán chuỗi thắng mới
-      const nextStreak = currentStreak + 1;
-
-      // 2. Tính "Điểm hy vọng" dựa trên streak
-      // Công thức: min((streak // 3) * 100, 1200)
-      const hopePoints = Math.min(Math.floor(nextStreak / 3) * 100, 1200);
-
-      let totalPoints = 0;
-
-      if (timeLeft <= 0) {
-        // TÌNH HUỐNG HẾT GIỜ: Chỉ nhận điểm hy vọng
-        totalPoints = hopePoints;
-      } else {
-        // TÌNH HUỐNG CÒN GIỜ: Điểm cơ bản (tốc độ) + Điểm hy vọng
-        const basePoints = Math.round((1000 + (timeLeft / (question.timeLimit || 20)) * 500) / 10) * 10;
-        totalPoints = basePoints + hopePoints;
+    // Chuẩn hóa đáp án (Chuyển chuỗi text sang index 1-based nếu là trắc nghiệm)
+    let userAnswer = selectedOption;
+    if (["multiple_choice", "true_false", "reading_sub"].includes(activeQuestion.type)) {
+      if (typeof selectedOption === "string" && activeQuestion.options) {
+        const options = activeQuestion.options as string[];
+        const idx = options.indexOf(selectedOption);
+        userAnswer = (idx !== -1 ? idx : -1) + 1;
       }
-
-      // 3. Cập nhật các trạng thái điểm và streak
-      setPointsEarned(totalPoints);
-      setScore((prev: number) => prev + totalPoints);
-      setCorrectAnswers((prev: number) => prev + 1);
-      
-      setCurrentStreak((prev: number) => {
-        const newStreak = prev + 1;
-        setMaxStreak((currentMax: number) => Math.max(currentMax, newStreak));
-        return newStreak;
-      });
-
-      // 4. Kích hoạt hiệu ứng giao diện
-      setShowPointsAnimation(true);
-      setScoreUpdateAnimation(true);
-      
-      setTimeout(() => {
-        setShowPointsAnimation(false);
-        setScoreUpdateAnimation(false);
-      }, 500);
-
-    } else {
-      // TÌNH HUỐNG SAI: Reset streak về 0 và lưu vào danh sách câu sai
-      setCurrentStreak(0);
-      setPointsEarned(0);
-      setWrongAnswers(question.id); 
     }
 
-    // Tự động chuyển câu sau 1.5 giây để người chơi xem kết quả đúng/sai
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 1500);
+    const isCorrect = checkAnswer(activeQuestion, userAnswer);
+    const currentMainQ = questions[currentQuestion];
+    const isReadingSub = currentMainQ.type === "reading" && !isReviseMode;
 
+    // Xử lý điểm số và trạng thái
+    if (isReadingSub) {
+      setCompletedSubQuestions(prev => [...prev, { id: activeQuestion.id, correct: isCorrect }]);
+      if (isCorrect) {
+        setPointsEarned(100);
+        setScore((prev) => prev + 100);
+        setCorrectAnswers((prev) => prev + 1);
+        setShowPointsAnimation(true);
+        setScoreUpdateAnimation(true);
+      }
+    } else {
+      if (isCorrect) {
+        const nextStreak = currentStreak + 1;
+        const streakBonus = Math.min(Math.floor(nextStreak / 3) * 100, 1200);
+        const limit = activeQuestion.timeLimit || currentMainQ.timeLimit || 20;
+        const basePoints = timeLeft <= 0 ? 0 : Math.round((1000 + (timeLeft / limit) * 500) / 10) * 10;
+        const totalPoints = basePoints + streakBonus;
+
+        setPointsEarned(totalPoints);
+        setScore((prev) => prev + totalPoints);
+        setCorrectAnswers((prev) => prev + 1);
+
+        if (isReviseMode) {
+          setWrongAnswers(activeQuestion.id, true);
+        } else {
+          setCurrentStreak((prev) => {
+            const newStreak = prev + 1;
+            setMaxStreak((currentMax) => Math.max(currentMax, newStreak));
+            return newStreak;
+          });
+        }
+        setShowPointsAnimation(true);
+        setScoreUpdateAnimation(true);
+      } else {
+        if (!isReviseMode) {
+          setCurrentStreak(0);
+          setWrongAnswers(activeQuestion.id);
+        }
+        setPointsEarned(0);
+      }
+    }
+
+    // Xử lý chuyển cảnh sau khi hiện feedback
+    setTimeout(() => {
+      setShowPointsAnimation(false);
+      setScoreUpdateAnimation(false);
+
+      if (isReviseMode) {
+        setIsReviseMode(false);
+        setTempQuestion(null);
+        setSelectedAnswer(null);
+        setShowFeedback(false);
+      } else {
+        const streakAfter = isCorrect ? currentStreak + 1 : 0;
+        
+        if (isCorrect && streakAfter > 0 && streakAfter % 5 === 0 && wrongAnswers.length > 0) {
+          const shuffled = [...wrongAnswers].sort(() => 0.5 - Math.random());
+          const options = shuffled.slice(0, 3).map(id => {
+            let found: any = questions.find(q => q.id === id);
+            if (!found) {
+              questions.forEach(q => {
+                if (q.type === "reading") {
+                  const sub = q.subQuestions.find(s => s.id === id);
+                  if (sub) found = sub;
+                }
+              });
+            }
+            return found;
+          }).filter(Boolean);
+          
+          setReviseOptions(options);
+          setShowReviseSelection(true);
+        } else {
+          if (currentMainQ.type === "reading" && subIndex < currentMainQ.subQuestions.length - 1) {
+            setSubIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+            setShowFeedback(false);
+          } else if (currentMainQ.type === "reading" && subIndex === currentMainQ.subQuestions.length - 1) {
+            const finalCompleted = [...completedSubQuestions, { id: activeQuestion.id, correct: isCorrect }];
+            const allCorrect = finalCompleted.every(sub => sub.correct);
+
+            if (allCorrect) {
+              setCurrentStreak((p) => p + 1);
+              setScore((p) => p + 500);
+            } else {
+              setCurrentStreak(0);
+              setWrongAnswers(currentMainQ.id);
+            }
+            setCompletedSubQuestions([]);
+            handleNextQuestion();
+          } else {
+            handleNextQuestion();
+          }
+        }
+      }
+    }, 1500);
   }, [
-    currentQuestion, 
-    questions, 
-    timeLeft, 
-    currentStreak, 
-    showFeedback, 
-    setSelectedAnswer, 
-    setShowFeedback, 
-    setPointsEarned, 
-    setScore, 
-    setCorrectAnswers, 
-    setCurrentStreak, 
-    setMaxStreak, 
-    setShowPointsAnimation, 
-    setScoreUpdateAnimation, 
-    handleNextQuestion, 
-    setWrongAnswers
+    currentQuestion, subIndex, questions, timeLeft, currentStreak, showFeedback, isReviseMode, 
+    tempQuestion, wrongAnswers, completedSubQuestions, setSelectedAnswer, setShowFeedback, 
+    setPointsEarned, setScore, setCorrectAnswers, setCurrentStreak, setMaxStreak, 
+    setShowPointsAnimation, setScoreUpdateAnimation, handleNextQuestion, setWrongAnswers, 
+    setIsReviseMode, setTempQuestion, setShowReviseSelection, setReviseOptions, setSubIndex,
+    setCompletedSubQuestions
   ]);
 
-  /**
-   * Trả về class Tailwind dựa trên trạng thái đúng/sai để hiển thị lên nút
-   */
+  // 4. Logic quản lý Class CSS cho các Option
   const getOptionClass = useCallback((option: string) => {
+    let activeQuestion: any = tempQuestion || questions[currentQuestion];
+    if (activeQuestion.type === "reading" && !isReviseMode) {
+      activeQuestion = activeQuestion.subQuestions[subIndex];
+    }
+
     if (!showFeedback) {
       return "w-full text-left p-6 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group transform hover:scale-102 shadow-sm hover:shadow-md";
     }
 
-    const question = questions[currentQuestion];
-    if (question.type !== "multiple_choice") return "";
-
     const isSelected = option === selectedAnswer;
-    const isCorrect = question.options?.[question.answer - 1] === option;
+    
+    // Kiểm tra đáp án đúng bằng cách so sánh text option
+    const options = activeQuestion.options as string[];
+    const isCorrect = options && options[activeQuestion.answer - 1] === option;
 
-    if (isCorrect) {
-      return "w-full text-left p-6 border-2 border-green-500 bg-green-100 rounded-2xl shadow-md text-green-700 font-bold";
-    }
-    if (isSelected && !isCorrect) {
-      return "w-full text-left p-6 border-2 border-red-500 bg-red-100 rounded-2xl shadow-md text-red-700 font-bold";
-    }
+    if (isCorrect) return "w-full text-left p-6 border-2 border-green-500 bg-green-100 rounded-2xl shadow-md text-green-700 font-bold";
+    if (isSelected && !isCorrect) return "w-full text-left p-6 border-2 border-red-500 bg-red-100 rounded-2xl shadow-md text-red-700 font-bold";
     return "w-full text-left p-6 border-2 border-gray-300 bg-gray-100 rounded-2xl opacity-50 cursor-not-allowed";
-  }, [showFeedback, questions, currentQuestion, selectedAnswer]);
-
-  /**
-   * Chơi lại quiz
-   */
-  const resetQuiz = useCallback(() => {
-    window.location.reload(); 
-  }, []);
+  }, [showFeedback, questions, currentQuestion, subIndex, selectedAnswer, tempQuestion, isReviseMode]);
 
   return {
     handleAnswerClick,
     handleNextQuestion,
     getOptionClass,
-    resetQuiz,
+    resetQuiz: () => window.location.reload(),
+    selectReviseQuestion
   };
 };

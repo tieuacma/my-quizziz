@@ -26,14 +26,12 @@ export default async function QuizPage({ params }: { params: Promise<{ slug: str
 
     // Tính toán Version dựa trên dữ liệu đã làm sạch
     const lastUpdate = mongoQuiz.updatedAt || mongoQuiz.createdAt || new Date().toISOString();
-    const quizVersion = `${mongoQuiz.questions.length}-${new Date(lastUpdate).getTime()}`;
 
     return (
       <div className="min-h-screen bg-gray-50">
         <QuizClient 
           user={user} 
           mongoQuiz={mongoQuiz} 
-          quizVersion={quizVersion} 
         />
       </div>
     );

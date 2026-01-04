@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Question } from "../data/quizdata";
+import { Question } from "../data/quizdata"; 
 import { useQuizEffects } from "./quizEffects";
 import { useQuizHandlers } from "./quizHandlers";
 import { createClient } from "@/lib/supabase/client";
@@ -20,14 +20,24 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
   // --- STATE QUẢN LÝ TIẾN ĐỘ ---
   const [questions] = useState<Question[]>(initialQuestions);
   const [currentQuestion, setCurrentQuestion] = useState(initialState.currentQuestion);
+  const [subIndex, setSubIndex] = useState(0); // CHỈ SỐ CÂU HỎI PHỤ (Dành cho Reading)
   const [score, setScore] = useState(initialState.score);
   const [wrongAnswers, setWrongAnswers] = useState<number[]>(initialState.wrongAnswers);
   const [showScore, setShowScore] = useState(false);
 
+  // --- STATE PHỤC THÙ (REVISE) ---
+  const [isReviseMode, setIsReviseMode] = useState(false);
+  const [showReviseSelection, setShowReviseSelection] = useState(false);
+  const [reviseOptions, setReviseOptions] = useState<any[]>([]); 
+  const [tempQuestion, setTempQuestion] = useState<any | null>(null);
+
+  // --- STATE CHO READING QUESTION ---
+  const [completedSubQuestions, setCompletedSubQuestions] = useState<{id: number, correct: boolean}[]>([]); 
+
   // --- STATE GIAO DIỆN & UI ---
-  const [isLoading, setIsLoading] = useState(true); // Khởi tạo là true để chạy effect loading
+  const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(initialQuestions[initialState.currentQuestion]?.timeLimit || 20);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -39,7 +49,7 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
 
   const isFirstRender = useRef(true);
 
-  // --- ĐỒNG BỘ HÓA SUPABASE (DEBOUNCED) ---
+  // --- ĐỒNG BỘ HÓA SUPABASE ---
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -48,6 +58,8 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
 
     const syncProgress = async () => {
       if (!sessionId) return;
+      // Không đồng bộ khi đang ở màn hình chọn câu hỏi phục thù để tránh ghi đè trạng thái tạm thời
+      if (showReviseSelection) return;
 
       const { error } = await supabase
         .from('quiz_sessions')
@@ -55,7 +67,6 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
           current_index: currentQuestion,
           score: score,
           wrong_answers: wrongAnswers,
-          // Sửa chỗ này nếu bạn dùng status là string
           status: showScore ? 'completed' : 'playing' 
         })
         .eq('id', sessionId);
@@ -63,14 +74,16 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
       if (error) console.error("Sync Error:", error.message);
     };
 
-    const timeoutId = setTimeout(syncProgress, 300); // Tăng lên 300ms để an toàn hơn cho mạng yếu
+    const timeoutId = setTimeout(syncProgress, 300);
     return () => clearTimeout(timeoutId);
-  }, [currentQuestion, score, wrongAnswers, showScore, sessionId, supabase]);
+  }, [currentQuestion, score, wrongAnswers, showScore, sessionId, supabase, showReviseSelection]);
 
   // --- HANDLERS ---
   const handlers = useQuizHandlers({
     questions,
     currentQuestion,
+    subIndex,
+    setSubIndex,
     timeLeft,
     currentStreak,
     showFeedback,
@@ -87,10 +100,23 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
     setCurrentQuestion,
     setTimeLeft,
     setShowScore,
-    // FIX: Đảm bảo không lưu trùng ID câu hỏi vào danh sách sai
-    setWrongAnswers: (id: number) => {
-      setWrongAnswers(prev => prev.includes(id) ? prev : [...prev, id]);
-    } 
+    wrongAnswers,
+    setWrongAnswers: (id: number, isCorrectRevise: boolean = false) => {
+      setWrongAnswers(prev => {
+        if (isCorrectRevise) return prev.filter(qId => qId !== id);
+        return prev.includes(id) ? prev : [...prev, id];
+      });
+    },
+    isReviseMode,
+    setIsReviseMode,
+    showReviseSelection,
+    setShowReviseSelection,
+    reviseOptions,
+    setReviseOptions,
+    tempQuestion,
+    setTempQuestion,
+    completedSubQuestions,
+    setCompletedSubQuestions
   });
 
   // --- EFFECTS ---
@@ -101,15 +127,16 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
     setTimeLeft,
     showScore,
     showFeedback,
-    questions, // Cần truyền để tính toán trong effects nếu cần
+    questions,
     currentQuestion,
     handleAnswerClick: handlers.handleAnswerClick,
   });
 
   return {
-    ...handlers,
+    ...handlers, // Bao gồm handleNextQuestion, handleAnswerClick, getOptionClass, selectReviseQuestion, resetQuiz
     questions,
     currentQuestion,
+    subIndex,
     score,
     showScore,
     timeLeft,
@@ -122,6 +149,12 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
     totalTimeSpent,
     maxStreak,
     isLoading,
-    wrongAnswers
+    wrongAnswers,
+    isReviseMode,
+    showReviseSelection,
+    reviseOptions,
+    tempQuestion,
+    completedSubQuestions,
+    currentStreak
   };
 };

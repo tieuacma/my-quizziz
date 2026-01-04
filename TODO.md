@@ -1,21 +1,12 @@
-# TODO: Implement Real-Time Leaderboard
+# TODO: Implement ReadingQuestion with subQuestions
 
-- [x] Create Leaderboard component with real-time updates
-- [x] Fetch top 10 scores from quiz_sessions table with user profiles
-- [x] Use Supabase real-time subscriptions for live leaderboard updates
-- [x] Create separate leaderboard page at quiz/[slug]/leaderboard
-- [x] Add proper styling with glassmorphism effect and ranking badges
-- [x] Fix database query foreign key reference
-- [x] Remove leaderboard from quiz gameplay interface
-- [x] Test leaderboard functionality and real-time updates
-- [ ] TEMPORARILY DISABLED: Both component and page have limitations that need fixing later
+## Steps to Complete
 
-# TODO: Improve FinalScore.tsx Interface
-
-- [x] Enhance score display with dynamic animation and particle effects
-- [x] Improve layout and visual hierarchy with better spacing and card designs
-- [x] Upgrade color schemes and add gradients for modern look
-- [x] Add progress bar for accuracy visualization
-- [x] Add animated icons and share button feature
-- [ ] Ensure responsiveness for mobile devices
-- [x] Polish typography and add subtle animations
+- [x] Add state in useQuiz.ts for reading mode: currentSubQuestion index, completedSubQuestions array, readingMode boolean
+- [x] Update quizHandlers.ts to handle subQuestion answers: correct adds points/streak, wrong marks ReadingQuestion as wrong, saves to supabase, restarts ReadingQuestion
+- [x] Modify QuizClient.tsx to render reading type with split layout: left side passage, right side clickable subQuestions list
+- [x] Add UI for subQuestion display with back button and color coding (green for correct, red for wrong)
+- [x] Ensure subQuestions share time from ReadingQuestion
+- [x] When all subQuestions answered, proceed to next question
+- [x] Test the reading question flow
+- [x] Verify supabase saving for wrong ReadingQuestions
