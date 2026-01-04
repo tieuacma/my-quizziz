@@ -1,36 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Question } from "../data/quizdata";
-import { useInitialQuizState } from "./quizInitialState";
 import { useQuizEffects } from "./quizEffects";
 import { useQuizHandlers } from "./quizHandlers";
+import { createClient } from "@/lib/supabase/client";
 
-// --- HOOK CHÍNH ---
+interface UseQuizProps {
+  initialQuestions: Question[];
+  sessionId: string;
+  initialState: {
+    currentQuestion: number;
+    score: number;
+    wrongAnswers: number[];
+  };
+}
 
-export const useQuiz = () => {
-  const [isLoading, setIsLoading] = useState(true);
+export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizProps) => {
+  const supabase = createClient();
+  
+  // --- STATE QUẢN LÝ TIẾN ĐỘ ---
+  const [questions] = useState<Question[]>(initialQuestions);
+  const [currentQuestion, setCurrentQuestion] = useState(initialState.currentQuestion);
+  const [score, setScore] = useState(initialState.score);
+  const [wrongAnswers, setWrongAnswers] = useState<number[]>(initialState.wrongAnswers);
+  const [showScore, setShowScore] = useState(false);
 
-  // 1. KHỞI TẠO ĐỒNG BỘ: Kiểm tra Hash và State ngay lập tức
-  const initialState = useInitialQuizState();
-
-  // 2. GÁN STATE: Đảm bảo tất cả state lấy từ cùng một nguồn initialState
-  const [questions, setQuestions] = useState<Question[]>(initialState?.questions || []);
-  const [currentQuestion, setCurrentQuestion] = useState(initialState?.currentQuestion || 0);
-  const [score, setScore] = useState(initialState?.score || 0);
-  const [showScore, setShowScore] = useState(initialState?.showScore || false);
-  const [timeLeft, setTimeLeft] = useState(initialState?.timeLeft || 0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(initialState?.selectedAnswer || null);
-  const [showFeedback, setShowFeedback] = useState(initialState?.showFeedback || false);
-  const [pointsEarned, setPointsEarned] = useState(initialState?.pointsEarned || 0);
-  const [correctAnswers, setCorrectAnswers] = useState(initialState?.correctAnswers || 0);
-  const [totalTimeSpent, setTotalTimeSpent] = useState(initialState?.totalTimeSpent || 0);
-  const [currentStreak, setCurrentStreak] = useState(initialState?.currentStreak || 0);
-  const [maxStreak, setMaxStreak] = useState(initialState?.maxStreak || 0);
-
+  // --- STATE GIAO DIỆN & UI ---
+  const [isLoading, setIsLoading] = useState(true); // Khởi tạo là true để chạy effect loading
+  const [timeLeft, setTimeLeft] = useState(initialQuestions[initialState.currentQuestion]?.timeLimit || 20);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [pointsEarned, setPointsEarned] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [scoreUpdateAnimation, setScoreUpdateAnimation] = useState(false);
 
-  // 3-5. EFFECTS
-  const { handleAnswerClick, handleNextQuestion, getOptionClass, resetQuiz } = useQuizHandlers({
+  const isFirstRender = useRef(true);
+
+  // --- ĐỒNG BỘ HÓA SUPABASE (DEBOUNCED) ---
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const syncProgress = async () => {
+      if (!sessionId) return;
+
+      const { error } = await supabase
+        .from('quiz_sessions')
+        .update({
+          current_index: currentQuestion,
+          score: score,
+          wrong_answers: wrongAnswers,
+          // Sửa chỗ này nếu bạn dùng status là string
+          status: showScore ? 'completed' : 'playing' 
+        })
+        .eq('id', sessionId);
+
+      if (error) console.error("Sync Error:", error.message);
+    };
+
+    const timeoutId = setTimeout(syncProgress, 300); // Tăng lên 300ms để an toàn hơn cho mạng yếu
+    return () => clearTimeout(timeoutId);
+  }, [currentQuestion, score, wrongAnswers, showScore, sessionId, supabase]);
+
+  // --- HANDLERS ---
+  const handlers = useQuizHandlers({
     questions,
     currentQuestion,
     timeLeft,
@@ -49,29 +87,28 @@ export const useQuiz = () => {
     setCurrentQuestion,
     setTimeLeft,
     setShowScore,
+    // FIX: Đảm bảo không lưu trùng ID câu hỏi vào danh sách sai
+    setWrongAnswers: (id: number) => {
+      setWrongAnswers(prev => prev.includes(id) ? prev : [...prev, id]);
+    } 
   });
 
+  // --- EFFECTS ---
   useQuizEffects({
     isLoading,
     setIsLoading,
-    initialState,
     timeLeft,
     setTimeLeft,
     showScore,
     showFeedback,
-    questions,
+    questions, // Cần truyền để tính toán trong effects nếu cần
     currentQuestion,
-    score,
-    selectedAnswer,
-    pointsEarned,
-    correctAnswers,
-    totalTimeSpent,
-    currentStreak,
-    maxStreak,
-    handleAnswerClick,
+    handleAnswerClick: handlers.handleAnswerClick,
   });
 
   return {
+    ...handlers,
+    questions,
     currentQuestion,
     score,
     showScore,
@@ -81,14 +118,10 @@ export const useQuiz = () => {
     pointsEarned,
     showPointsAnimation,
     scoreUpdateAnimation,
-    handleAnswerClick,
-    handleNextQuestion,
-    getOptionClass,
-    questions,
     correctAnswers,
     totalTimeSpent,
     maxStreak,
     isLoading,
-    resetQuiz,
+    wrongAnswers
   };
 };
