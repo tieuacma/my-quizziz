@@ -1,12 +1,13 @@
-# TODO: Implement ReadingQuestion with subQuestions
+# Quiz Bug Fixes
 
-## Steps to Complete
+## Issues to Fix
+1. **Delay in multiple-choice answers**: Reduce the 1500ms timeout after selecting an answer.
+2. **Undefined answers and missing subquestions in revenge mode for reading questions**: Fix subquestion handling in revise mode.
+3. **Infinite loop in revenge**: Ensure proper state resets after revise mode.
 
-- [x] Add state in useQuiz.ts for reading mode: currentSubQuestion index, completedSubQuestions array, readingMode boolean
-- [x] Update quizHandlers.ts to handle subQuestion answers: correct adds points/streak, wrong marks ReadingQuestion as wrong, saves to supabase, restarts ReadingQuestion
-- [x] Modify QuizClient.tsx to render reading type with split layout: left side passage, right side clickable subQuestions list
-- [x] Add UI for subQuestion display with back button and color coding (green for correct, red for wrong)
-- [x] Ensure subQuestions share time from ReadingQuestion
-- [x] When all subQuestions answered, proceed to next question
-- [x] Test the reading question flow
-- [x] Verify supabase saving for wrong ReadingQuestions
+## Tasks
+- [x] Reduce feedback timeout in `handleAnswerClick` from 1500ms to 800ms for better UX.
+- [x] Fix revise mode for reading questions: Properly handle subquestions when `tempQuestion` is a reading question.
+- [x] Reset `subIndex` to 0 when entering revise mode to prevent subquestion display issues.
+- [x] Ensure all states are properly reset after revise mode to prevent infinite loops.
+- [x] Update QuizGame to render ReadingContent for reading subquestions in revise mode.

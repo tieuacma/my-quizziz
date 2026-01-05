@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -12,12 +13,12 @@ interface OptionsProps {
 
 // Component nội bộ để xử lý render nội dung
 const MarkdownRenderer = ({ content }: { content: string }) => (
-  <ReactMarkdown 
-    remarkPlugins={[remarkMath]} 
+  <ReactMarkdown
+    remarkPlugins={[remarkMath]}
     rehypePlugins={[rehypeKatex]}
     components={{
       // Đảm bảo các thẻ p (do markdown sinh ra) không làm lệch layout căn giữa
-      p: ({ children }) => <p className="m-0 inline-block">{children}</p> 
+      p: ({ children }) => <p className="m-0 inline-block">{children}</p>
     }}
   >
     {content}
@@ -25,19 +26,31 @@ const MarkdownRenderer = ({ content }: { content: string }) => (
 );
 
 export default function Options({ options, getOptionClass, handleAnswerClick, showFeedback }: OptionsProps) {
+  const isProcessingRef = useRef(false);
+
+  const handleClick = (option: string) => {
+    if (showFeedback || isProcessingRef.current) return;
+    isProcessingRef.current = true;
+    handleAnswerClick(option);
+    // Reset processing flag after a short delay to allow for state updates
+    setTimeout(() => {
+      isProcessingRef.current = false;
+    }, 100);
+  };
+
   return (
     /* Giữ nguyên grid 2 cột để ô đáp án to và thoáng */
     <div className="grid grid-cols-2 gap-8 mt-10">
       {options.map((option, index) => (
         <button
           key={index}
-          onClick={() => !showFeedback && handleAnswerClick(option)}
-          disabled={showFeedback}
+          onClick={() => handleClick(option)}
+          disabled={showFeedback || isProcessingRef.current}
           /* justify-center và items-center để nội dung luôn nằm giữa ô */
-          className={`${getOptionClass(option)} 
-            flex items-center justify-center 
-            p-8 rounded-[2rem] border-2 
-            transition-all min-h-[110px] group shadow-sm 
+          className={`${getOptionClass(option)}
+            flex items-center justify-center
+            p-8 rounded-[2rem] border-2
+            transition-all min-h-[110px] group shadow-sm
             hover:shadow-xl active:scale-95`}
         >
           {/* Sử dụng div thay cho span vì Markdown sẽ render ra các block.

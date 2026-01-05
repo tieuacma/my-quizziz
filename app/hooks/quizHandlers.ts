@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { Question, checkAnswer, ReadingSubQuestion } from "../data/quizdata";
+import { useAudio } from "./useAudio";
 
 interface QuizHandlersProps {
   questions: Question[];
   currentQuestion: number;
-  subIndex: number;
-  setSubIndex: React.Dispatch<React.SetStateAction<number>>;
+  subIndex: number | undefined;
+  setSubIndex: React.Dispatch<React.SetStateAction<number | undefined>>;
   timeLeft: number;
   currentStreak: number;
   showFeedback: boolean;
@@ -47,6 +48,9 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
     completedSubQuestions, setCompletedSubQuestions,
   } = props;
 
+  // Audio functionality
+  const { playCorrectSound, playWrongSound } = useAudio();
+
   // 1. Logic chuyển câu hỏi tiếp theo
   const handleNextQuestion = useCallback(() => {
     const nextQuestion = currentQuestion + 1;
@@ -70,7 +74,14 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
     setSelectedAnswer(null);
     setShowFeedback(false);
     setTimeLeft((q as Question).timeLimit || 20);
-  }, [setIsReviseMode, setShowReviseSelection, setSelectedAnswer, setShowFeedback, setTimeLeft, setTempQuestion]);
+    // For reading questions in revise mode, start from the first sub-question
+    if (q.type === "reading" || q.type === "reading_sub") {
+      setSubIndex(0);
+      setCompletedSubQuestions([]);
+    } else {
+      setSubIndex(0);
+    }
+  }, [setIsReviseMode, setShowReviseSelection, setSelectedAnswer, setShowFeedback, setTimeLeft, setTempQuestion, setSubIndex, setCompletedSubQuestions]);
 
   // 3. Logic xử lý khi người dùng chọn đáp án
   const handleAnswerClick = useCallback((selectedOption: string | number) => {
@@ -78,8 +89,13 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
 
     // Ép kiểu về any để linh hoạt truy cập thuộc tính options mà không bị lỗi TS
     let activeQuestion: any = tempQuestion || questions[currentQuestion];
-    if (activeQuestion.type === "reading" && !isReviseMode) {
+    if (activeQuestion.type === "reading" && !isReviseMode && subIndex !== undefined) {
       activeQuestion = activeQuestion.subQuestions[subIndex];
+    } else if (activeQuestion.type === "reading" && isReviseMode && subIndex !== undefined) {
+      activeQuestion = activeQuestion.subQuestions[subIndex];
+    } else if (activeQuestion.type === "reading_sub" && isReviseMode) {
+      // In revise mode, tempQuestion is already the sub-question
+      activeQuestion = activeQuestion;
     }
 
     setSelectedAnswer(selectedOption);
@@ -98,6 +114,13 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
     const isCorrect = checkAnswer(activeQuestion, userAnswer);
     const currentMainQ = questions[currentQuestion];
     const isReadingSub = currentMainQ.type === "reading" && !isReviseMode;
+
+    // Play sound effects
+    if (isCorrect) {
+      playCorrectSound();
+    } else {
+      playWrongSound();
+    }
 
     // Xử lý điểm số và trạng thái
     if (isReadingSub) {
@@ -147,10 +170,25 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
       setScoreUpdateAnimation(false);
 
       if (isReviseMode) {
-        setIsReviseMode(false);
-        setTempQuestion(null);
-        setSelectedAnswer(null);
-        setShowFeedback(false);
+        // Handle reading questions in revise mode - progress through sub-questions
+        const currentTempQ = tempQuestion;
+        if (currentTempQ.type === "reading" && subIndex !== undefined && subIndex < currentTempQ.subQuestions.length - 1) {
+          setSubIndex(prev => (prev !== undefined ? prev + 1 : 0));
+          setSelectedAnswer(null);
+          setShowFeedback(false);
+        } else if (currentTempQ.type === "reading" && subIndex !== undefined && subIndex === currentTempQ.subQuestions.length - 1) {
+          // All sub-questions completed in revise mode
+          setIsReviseMode(false);
+          setTempQuestion(null);
+          setSelectedAnswer(null);
+          setShowFeedback(false);
+        } else {
+          // Single question revise mode
+          setIsReviseMode(false);
+          setTempQuestion(null);
+          setSelectedAnswer(null);
+          setShowFeedback(false);
+        }
       } else {
         const streakAfter = isCorrect ? currentStreak + 1 : 0;
         
@@ -172,11 +210,11 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
           setReviseOptions(options);
           setShowReviseSelection(true);
         } else {
-          if (currentMainQ.type === "reading" && subIndex < currentMainQ.subQuestions.length - 1) {
-            setSubIndex(prev => prev + 1);
+          if (currentMainQ.type === "reading" && subIndex !== undefined && subIndex < currentMainQ.subQuestions.length - 1) {
+            setSubIndex(prev => (prev !== undefined ? prev + 1 : 0));
             setSelectedAnswer(null);
             setShowFeedback(false);
-          } else if (currentMainQ.type === "reading" && subIndex === currentMainQ.subQuestions.length - 1) {
+          } else if (currentMainQ.type === "reading" && subIndex !== undefined && subIndex === currentMainQ.subQuestions.length - 1) {
             const finalCompleted = [...completedSubQuestions, { id: activeQuestion.id, correct: isCorrect }];
             const allCorrect = finalCompleted.every(sub => sub.correct);
 
@@ -194,7 +232,7 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
           }
         }
       }
-    }, 1500);
+    }, 800);
   }, [
     currentQuestion, subIndex, questions, timeLeft, currentStreak, showFeedback, isReviseMode, 
     tempQuestion, wrongAnswers, completedSubQuestions, setSelectedAnswer, setShowFeedback, 
@@ -207,8 +245,13 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
   // 4. Logic quản lý Class CSS cho các Option
   const getOptionClass = useCallback((option: string) => {
     let activeQuestion: any = tempQuestion || questions[currentQuestion];
-    if (activeQuestion.type === "reading" && !isReviseMode) {
+    if (activeQuestion.type === "reading" && !isReviseMode && subIndex !== undefined) {
       activeQuestion = activeQuestion.subQuestions[subIndex];
+    } else if (activeQuestion.type === "reading" && isReviseMode && subIndex !== undefined) {
+      activeQuestion = activeQuestion.subQuestions[subIndex];
+    } else if (activeQuestion.type === "reading_sub" && isReviseMode) {
+      // In revise mode, tempQuestion is already the sub-question
+      activeQuestion = activeQuestion;
     }
 
     if (!showFeedback) {

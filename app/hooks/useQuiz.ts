@@ -20,7 +20,7 @@ export const useQuiz = ({ initialQuestions, sessionId, initialState }: UseQuizPr
   // --- STATE QUẢN LÝ TIẾN ĐỘ ---
   const [questions] = useState<Question[]>(initialQuestions);
   const [currentQuestion, setCurrentQuestion] = useState(initialState.currentQuestion);
-  const [subIndex, setSubIndex] = useState(0); // CHỈ SỐ CÂU HỎI PHỤ (Dành cho Reading)
+  const [subIndex, setSubIndex] = useState<number | undefined>(0); // CHỈ SỐ CÂU HỎI PHỤ (Dành cho Reading)
   const [score, setScore] = useState(initialState.score);
   const [wrongAnswers, setWrongAnswers] = useState<number[]>(initialState.wrongAnswers);
   const [showScore, setShowScore] = useState(false);

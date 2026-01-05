@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb/client";
 
-export const runtime = "nodejs"; // 🔥 BẮT BUỘC
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
