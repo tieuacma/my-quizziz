@@ -180,6 +180,8 @@ export default function QuizGame({ activeSession, mongoQuiz }: QuizGameProps) {
                           getOptionClass={getOptionClass}
                           handleAnswerClick={handleAnswerClick}
                           showFeedback={showFeedback}
+                          questionId={activeQ.id}
+                          questionType={activeQ.type}
                         />
                       ) : (
                         <FillInBlank

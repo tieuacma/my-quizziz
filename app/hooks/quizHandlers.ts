@@ -37,6 +37,8 @@ interface QuizHandlersProps {
   setCompletedSubQuestions: React.Dispatch<React.SetStateAction<{ id: number; correct: boolean }[]>>;
 }
 
+export type GetOptionClassFunction = (option: string, shuffledOptions?: string[], originalIndices?: number[]) => string;
+
 export const useQuizHandlers = (props: QuizHandlersProps) => {
   const {
     questions, currentQuestion, subIndex, setSubIndex, timeLeft, currentStreak,
@@ -243,7 +245,7 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
   ]);
 
   // 4. Logic quản lý Class CSS cho các Option
-  const getOptionClass = useCallback((option: string) => {
+  const getOptionClass = useCallback((option: string, shuffledOptions?: string[], originalIndices?: number[]) => {
     let activeQuestion: any = tempQuestion || questions[currentQuestion];
     if (activeQuestion.type === "reading" && !isReviseMode && subIndex !== undefined) {
       activeQuestion = activeQuestion.subQuestions[subIndex];
@@ -259,10 +261,23 @@ export const useQuizHandlers = (props: QuizHandlersProps) => {
     }
 
     const isSelected = option === selectedAnswer;
-    
-    // Kiểm tra đáp án đúng bằng cách so sánh text option
-    const options = activeQuestion.options as string[];
-    const isCorrect = options && options[activeQuestion.answer - 1] === option;
+
+    // Kiểm tra đáp án đúng - nếu có shuffled options thì sử dụng original indices
+    let isCorrect = false;
+    if (shuffledOptions && originalIndices) {
+      // Tìm vị trí của option trong shuffled options
+      const shuffledIndex = shuffledOptions.indexOf(option);
+      if (shuffledIndex !== -1) {
+        // Lấy original index từ shuffled indices
+        const originalIndex = originalIndices[shuffledIndex];
+        // Kiểm tra xem original index có phải là đáp án đúng không
+        isCorrect = (originalIndex + 1) === activeQuestion.answer;
+      }
+    } else {
+      // Fallback to original logic if no shuffled options provided
+      const options = activeQuestion.options as string[];
+      isCorrect = options && options[activeQuestion.answer - 1] === option;
+    }
 
     if (isCorrect) return "w-full text-left p-6 border-2 border-green-500 bg-green-100 rounded-2xl shadow-md text-green-700 font-bold";
     if (isSelected && !isCorrect) return "w-full text-left p-6 border-2 border-red-500 bg-red-100 rounded-2xl shadow-md text-red-700 font-bold";

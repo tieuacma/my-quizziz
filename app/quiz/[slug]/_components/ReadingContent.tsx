@@ -144,6 +144,8 @@ export default function ReadingContent({
                 getOptionClass={getOptionClass}
                 handleAnswerClick={handleAnswerClick}
                 showFeedback={showFeedback}
+                questionId={activeQ.subQuestions[subIndex].id}
+                questionType={activeQ.subQuestions[subIndex].type}
               />
             ) : (
               <FillInBlank
